@@ -64,4 +64,4 @@ app.post("/post_task/:userId",(req,res,next)=>{
 });
 */
 const api=functions.https.onRequest(app);
-module.export={api};
+module.exports={api};
