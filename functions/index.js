@@ -16,14 +16,40 @@ app.get("/get_uuid/",(req,res,next)=>{
     res.send();
 });
 */
-app.get("/get_timetable/:userId",(req,res,next)=>{
-    const timetable=db.collection("groups").doc(req.params.userId).collection(time-schedule); 
-    res.json(timetable);
+app.get("/get_timetable/:userId",async (req,res,next)=>{
+    try{
+        var timetable_data=[];
+        db.collection("groups").doc(req.params.userId).collection(time-schedule).get().then(querySnapshot =>{
+            querySnapshot.forEach(doc =>{
+                timetable_data.push({
+                    id:doc.id,
+                    data:doc.data()
+                });
+            });
+        res.json(timetable_data);
+        });
+    }
+    catch(e){
+        next(e);
+    }
 });
 
-app.get("/get_task/:userId",(req,res,next)=>{
-    const task=db.collection("groups").doc(req.params.userId).collection(homework);  
-    res.send(task);
+app.get("/get_task/:userId", async (req,res,next)=>{
+    try{
+        var task_data=[];
+        db.collection("groups").doc(req.params.userId).collection(homework).get().then(querySnapshot =>{
+            querySnapshot.forEach(doc =>{
+                task_data.push({
+                    id:doc.id,
+                    data:doc.data()
+                });
+            });
+        res.json(task_data);
+        });
+    }
+    catch(e){
+        next(e);
+    }
 });
 
 /*
