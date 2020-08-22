@@ -10,7 +10,7 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "10"
+    "node": "14"
   },
   "dependencies": {
     "@line/bot-sdk": "^7.0.0",
@@ -23,5 +23,5 @@
     "eslint-plugin-promise": "^4.0.1",
     "firebase-functions-test": "^0.2.0"
   },
-  "private": true 
+  "private": true
 }
