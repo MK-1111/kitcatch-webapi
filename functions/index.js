@@ -28,7 +28,7 @@ app.get("/get_timetable/:userId",async (req,res,next)=>{
             querySnapshot.forEach(doc =>{
                 timetable_data.push({
                     id:doc.id,
-                    ...doc.data()
+                    ...doc.data().timestamp.toDate()
                 });
             });
         res.json(timetable_data);
@@ -60,14 +60,26 @@ app.get("/get_task/:userId", async (req,res,next)=>{
 
 /*
 app.post("/post_timetable/:userId",(req,res,next)=>{
-    const 
-    res.send();
-});
-
-app.post("/post_task/:userId",(req,res,next)=>{
-    const 
+    const newData = req.body;
+    var docRef = db.collection("groups").doc(req.params.userId).collection("time-schedule").doc(newData.day);
+    docRef
     res.send();
 });
 */
+app.post("/post_task/",(req,res,next)=>{
+    const newData = req.body;
+    const newDuedate=admin.firebase.firestore.Timestamp.fromDate(new Date(newData.due_date));
+    db.collection("groups").doc(newData.userId).collection("homework").doc(newData.name)
+    .set({
+        class_name:newData.class_name,
+        due_date:newDuedate,
+        task_name:newData.task_name
+    }).then(function(){
+        res.send("success");
+    })
+    .catch(function(error){
+        next(error);
+    });
+});
 const api=functions.region("asia-northeast1").https.onRequest(app);
 module.exports={api};
