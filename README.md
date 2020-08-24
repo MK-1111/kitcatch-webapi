@@ -5,3 +5,8 @@ userの時間割の取得
 userの課題の取得
 ## update_uuid　　（POST）
 ワンタイムパスワードの更新
+bodyに
+{
+    "userId":"5I",
+    "uuid":"111111"
+}
