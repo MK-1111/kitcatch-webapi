@@ -15,8 +15,10 @@ var db=admin.firestore();
 app.post("/update_uuid",async (req,res,next)=>{
     try{
     const newUUid=req.body;
+    const NowTime=new Date().getTime();
     db.collection("users").doc(req.body.userId).update({
-        uuid:newUUid.uuid
+        uuid:newUUid.uuid,
+        IssueTime:NowTime
     })
     .then(function(){
         res.send("success");
