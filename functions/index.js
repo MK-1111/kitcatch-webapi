@@ -6,33 +6,38 @@ const cors = require('cors');
 const app =express();
 app.use(cors({origin: true}));
 
-var serviceAccount = require("/home/star333/kitcatch/functions/serviceAccountKey.json");
+//var serviceAccount = require("/home/star333/kitcatch/functions/serviceAccountKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://friendlychat-1b9cf.firebaseio.com"
-});
+admin.initializeApp();
 
 var db=admin.firestore();
-/*
 
-app.get("/get_uuid/",(req,res,next)=>{
-    res.send();
+app.post("/update_uuid",async (req,res,next)=>{
+    try{
+    const newUUid=req.body;
+    db.collection("users").doc(req.body.userId).update({
+        uuid:newUUid.uuid
+    })
+    .then(function(){
+        res.send("success");
+    })
+    .catch(function(error){
+        res.send(error);
+    });
+}
+catch(e){
+    next(e);
+}
 });
-*/
+
 app.get("/get_timetable/:userId",async (req,res,next)=>{
     try{
-        var timetable_data=[];
-        db.collection("groups").doc(req.params.userId).collection("time-schedule").get()
-        .then(querySnapshot =>{
-            querySnapshot.forEach(doc =>{
-                timetable_data.push({
-                    id:doc.id,
-                    ...doc.data().timestamp.toDate()
-                });
-            });
-        res.json(timetable_data);
-        });
+        const timetableRef = await db.collection("users").doc(req.params.userId).get();
+        if(timetableRef.exists){
+            res.send(timetableRef.get("timetable"));
+        }else{
+            res.send("timetable does not exist.");
+        }
     }
     catch(error){
         next(error);
@@ -41,45 +46,42 @@ app.get("/get_timetable/:userId",async (req,res,next)=>{
 
 app.get("/get_task/:userId", async (req,res,next)=>{
     try{
-        var task_data=[];
-        db.collection("groups").doc(req.params.userId).collection("homework").get()
-        .then(querySnapshot =>{
-            querySnapshot.forEach(doc =>{
-                task_data.push({
-                    id:doc.id,
-                    ...doc.data()
-                });
-            });
-        res.json(task_data);
-        });
+        const taskRef = await db.collection("users").doc(req.params.userId).get();
+        if(taskRef.exists){
+            res.send(taskRef.get("task"));
+        }else{
+            res.send("task does not exist.");
+        }
     }
     catch(error){
         next(error);
     }
 });
 
-/*
-app.post("/post_timetable/:userId",(req,res,next)=>{
+
+app.post("/post_timetable",(req,res,next)=>{
     const newData = req.body;
-    var docRef = db.collection("groups").doc(req.params.userId).collection("time-schedule").doc(newData.day);
-    docRef
-    res.send();
-});
-*/
-app.post("/post_task/",(req,res,next)=>{
-    const newData = req.body;
-    const newDuedate=admin.firebase.firestore.Timestamp.fromDate(new Date(newData.due_date));
-    db.collection("groups").doc(newData.userId).collection("homework").doc(newData.name)
-    .set({
-        class_name:newData.class_name,
-        due_date:newDuedate,
-        task_name:newData.task_name
-    }).then(function(){
+    db.collection("users").doc(newData.userId)
+    .update({timetable:newData.timetable})
+    .then(function(){
         res.send("success");
     })
     .catch(function(error){
-        next(error);
+        res.send(error);
     });
 });
+
+app.post("/post_task",(req,res,next)=>{
+    const newData = req.body;
+    db.collection("users").doc(newData.userId)
+    .update({task:newData.task})
+    .then(function(){
+        res.send("success");
+    })
+    .catch(function(error){
+        res.send(error);
+    });
+});
+
 const api=functions.region("asia-northeast1").https.onRequest(app);
 module.exports={api};
