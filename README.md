@@ -31,5 +31,5 @@ bodyに
     "task":data
 }
 
-## get_uuid/:userId
+## get_uuid/:userId　　（GET）
 ワンタイムパスワードの取得
