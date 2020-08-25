@@ -30,3 +30,6 @@ bodyに
     "userId":"5I",
     "task":data
 }
+
+## get_uuid/:userId
+ワンタイムパスワードの取得
